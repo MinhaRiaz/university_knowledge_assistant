@@ -1,9 +1,12 @@
 import os
 import streamlit as st
+
+# Updated imports for LangChain 0.2+ / 0.3+
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-from langchain.chains import create_retrieval_chain
+
+from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -17,21 +20,19 @@ st.set_page_config(
 )
 
 st.title("🎓 University Academic & Student Knowledge Assistant")
-st.caption("Enterprise RAG Application powered by FAISS, Groq (gpt oss 120b), and LangChain")
+st.caption("Enterprise RAG Application powered by FAISS, Groq (Llama 3.3), and LangChain")
 
 # ------------------------------------------------------------------------------
 # 2. LOAD PRE-COMPUTED FAISS VECTORSTORE
 # ------------------------------------------------------------------------------
 @st.cache_resource(show_spinner="Loading Knowledge Base...")
 def load_vectorstore():
-    # Model matching the embeddings used in Google Colab indexing
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
         model_kwargs={'device': 'cpu'},
         encode_kwargs={'normalize_embeddings': True}
     )
     
-    # Load pre-computed FAISS vector database
     vectorstore = FAISS.load_local(
         folder_path="faiss_index",
         embeddings=embeddings,
