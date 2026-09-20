@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 st.title("🎓 University Academic & Student Knowledge Assistant")
-st.caption("Enterprise RAG Application powered by FAISS, Groq (Llama 3.3), and LangChain")
+st.caption("Enterprise RAG Application powered by FAISS, Groq (gpt oss 120b), and LangChain")
 
 # ------------------------------------------------------------------------------
 # 2. LOAD PRE-COMPUTED FAISS VECTORSTORE
@@ -61,7 +61,7 @@ if not groq_api_key:
 
 llm = ChatGroq(
     groq_api_key=groq_api_key,
-    model_name="llama-3.3-70b-versatile",
+    model_name="openai/gpt-oss-120b",
     temperature=0.2
 )
 
