@@ -57,6 +57,7 @@ if not groq_api_key:
     st.warning("⚠️ GROQ_API_KEY missing! Please add GROQ_API_KEY in Streamlit Secrets.")
     st.stop()
 
+# Model selection for Groq
 llm = ChatGroq(
     groq_api_key=groq_api_key,
     model_name="openai/gpt-oss-120b",
@@ -80,7 +81,7 @@ prompt = ChatPromptTemplate.from_template(system_prompt)
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
-# LCEL Pipeline
+# Modern LCEL Chain Architecture
 rag_chain = (
     {"context": retriever | format_docs, "question": RunnablePassthrough()}
     | prompt
