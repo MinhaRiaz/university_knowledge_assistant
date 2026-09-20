@@ -1,14 +1,11 @@
 import os
 import streamlit as st
-
-# Updated imports for LangChain 0.2+ / 0.3+
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
-
-from langchain.chains.retrieval import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 # ------------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION
@@ -20,7 +17,7 @@ st.set_page_config(
 )
 
 st.title("🎓 University Academic & Student Knowledge Assistant")
-st.caption("Enterprise RAG Application powered by FAISS, Groq (Llama 3.3), and LangChain")
+st.caption("Enterprise RAG Application powered by FAISS, Groq, and LangChain (LCEL)")
 
 # ------------------------------------------------------------------------------
 # 2. LOAD PRE-COMPUTED FAISS VECTORSTORE
@@ -67,23 +64,29 @@ llm = ChatGroq(
 )
 
 # ------------------------------------------------------------------------------
-# 4. RAG PROMPT & CHAIN SETUP
+# 4. RAG PROMPT & LCEL PIPELINE SETUP
 # ------------------------------------------------------------------------------
 system_prompt = (
     "You are an official University Academic and Student Knowledge Assistant.\n"
     "Answer the user's question accurately using ONLY the provided context below.\n"
     "If the answer cannot be found in the context, explicitly say: "
     "'I could not find relevant information in the university policy documents.'\n\n"
-    "Context:\n{context}"
+    "Context:\n{context}\n\n"
+    "Question: {question}"
 )
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", system_prompt),
-    ("human", "{input}"),
-])
+prompt = ChatPromptTemplate.from_template(system_prompt)
 
-combine_docs_chain = create_stuff_documents_chain(llm, prompt)
-rag_chain = create_retrieval_chain(retriever, combine_docs_chain)
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+# LCEL Pipeline
+rag_chain = (
+    {"context": retriever | format_docs, "question": RunnablePassthrough()}
+    | prompt
+    | llm
+    | StrOutputParser()
+)
 
 # ------------------------------------------------------------------------------
 # 5. CHAT INTERFACE & SOURCE TRACEABILITY
@@ -108,9 +111,11 @@ if user_input := st.chat_input("Ask about scholarship policies, fee structure, e
 
     with st.chat_message("assistant"):
         with st.spinner("Searching official university documents..."):
-            response = rag_chain.invoke({"input": user_input})
-            answer = response["answer"]
-            retrieved_docs = response["context"]
+            # Fetch retrieved documents for source tracing
+            retrieved_docs = retriever.invoke(user_input)
+            
+            # Generate answer using LCEL chain
+            answer = rag_chain.invoke(user_input)
 
             st.markdown(answer)
 
