@@ -1,0 +1,47 @@
+{
+  "project_name": "University Academic & Student Knowledge Assistant",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "vector_store": "FAISS",
+  "chunk_size": 1000,
+  "chunk_overlap": 200,
+  "total_documents": 6,
+  "total_chunks": 11,
+  "documents_manifest": [
+    {
+      "file_name": "Academic Calendar.pdf",
+      "total_pages": 1,
+      "chunks": 1,
+      "category": "Academic Schedule"
+    },
+    {
+      "file_name": "Admission Guidelines.pdf",
+      "total_pages": 1,
+      "chunks": 2,
+      "category": "Admissions"
+    },
+    {
+      "file_name": "Examination Rules.pdf",
+      "total_pages": 1,
+      "chunks": 2,
+      "category": "Examination & Grading"
+    },
+    {
+      "file_name": "Fee Policy.pdf",
+      "total_pages": 1,
+      "chunks": 2,
+      "category": "Financial Services"
+    },
+    {
+      "file_name": "Scholarship Policy.pdf",
+      "total_pages": 1,
+      "chunks": 2,
+      "category": "Financial Aid"
+    },
+    {
+      "file_name": "University Student Handbook.pdf",
+      "total_pages": 1,
+      "chunks": 2,
+      "category": "General Policies"
+    }
+  ]
+}
